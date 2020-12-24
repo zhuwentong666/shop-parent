@@ -28,6 +28,21 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
 
     @Override
+    public Result<CategoryEntity> updateById(CategoryEntity categoryEntity) {
+        try {
+            categoryMapper.updateByPrimaryKeySelective(categoryEntity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return this.setResultSuccess();
+    }
+
+
+
+
+
+
+    @Override
     public Result<List<CategoryEntity>> getCategoryByPid(Integer pid) {
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setParentId(pid);
@@ -65,4 +80,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         categoryMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
     }
+
+
+
 }
