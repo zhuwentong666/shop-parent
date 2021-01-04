@@ -2,7 +2,9 @@ package com.zwt.shop.service;
 
 import com.google.gson.JsonObject;
 import com.zwt.shop.base.Result;
+import com.zwt.shop.dto.SpecParamDTO;
 import com.zwt.shop.dto.SpecificationDTO;
+import com.zwt.shop.entity.SpecParamEntity;
 import com.zwt.shop.entity.SpecificationEntity;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +30,22 @@ public interface SpecificationService {
     @ApiOperation(value="删除数据")
     @DeleteMapping("spec/group/{id}")
     Result<List<JsonObject>> deleteById(@PathVariable Integer id);
+
+
+    @ApiOperation(value = "查询规格参数")
+    @GetMapping(value = "spec/list")
+    Result<List<SpecParamEntity>> specList(SpecParamDTO specParamDTO);
+    @ApiOperation(value="新增规格参数")
+    @PostMapping(value="spec/param")
+    Result<List<JsonObject>> specSave(@RequestBody SpecParamDTO specParamDTO);
+
+    @ApiOperation(value="新增规格参数")
+    @PutMapping(value="spec/param")
+    Result<List<JsonObject>> specEdit(@RequestBody SpecParamDTO specParamDTO);
+
+    @ApiOperation(value="删除规格参数")
+    @DeleteMapping(value="spec/delete")
+    Result<List<JsonObject>> specDelete(Integer id);
 
 
 }

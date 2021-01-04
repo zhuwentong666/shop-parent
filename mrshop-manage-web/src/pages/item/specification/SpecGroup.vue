@@ -106,9 +106,18 @@ export default {
           this.$message.confirm("确认要删除分组吗？")
           .then(() => {
             this.$http.delete("spec/group/" + id)
-                .then(() => {
-                    this.$message.success("删除成功");
-                    this.loadData();
+                .then(resp => {
+                    console.log(resp)
+                    if(resp.data.code==500){
+                    this.$message.error(resp.data.message);
+                      this.loadData();
+                      return;
+                    }else{
+                        this.$message.success("删除成功");
+                         this.loadData();
+                    }
+                   
+                      
                 })
           })
       },

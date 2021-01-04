@@ -95,17 +95,15 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
             //如果当前分类被品牌绑定的话不能被删除 --> 通过分类id查询中间表是否有数据 true : 当前分类不能被删除 false:继续执行
 
-        Example example1 = new Example(CategoryBrandEntity.class);
-            example1.createCriteria().andEqualTo("categoryId",id);
-        List<CategoryBrandEntity> categoryBrandEntityList = categoryBrandMapper.selectByExample(example1);
-        if (categoryBrandEntityList.size()!=0){return this.setResultError("已绑定品牌 删除失败");};
+//        Example example1 = new Example(CategoryBrandEntity.class);
+//            example1.createCriteria().andEqualTo("categoryId",id);
+//        List<CategoryBrandEntity> categoryBrandEntityList = categoryBrandMapper.selectByExample(example1);
+//        if (categoryBrandEntityList.size()!=0){return this.setResultError("已绑定品牌 删除失败");};
 
 
 
-//        CategoryBrandEntity categoryBrandEntity = categoryBrandMapper.selectByCategoryId(id);
-//        if (categoryBrandEntity != null){
-//                this.setResultError("当前数据被绑定 无法被删除");
-//            }
+        List<CategoryBrandEntity> categoryBrandList = categoryBrandMapper.selectByCategoryId(id);
+            if(categoryBrandList.size()>0)return this.setResultError("被绑定 无法删除");
 
 
 

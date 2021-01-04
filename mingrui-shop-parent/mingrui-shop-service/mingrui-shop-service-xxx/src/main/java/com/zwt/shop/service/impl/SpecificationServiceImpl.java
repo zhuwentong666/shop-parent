@@ -3,8 +3,11 @@ package com.zwt.shop.service.impl;
 import com.google.gson.JsonObject;
 import com.zwt.shop.base.BaseApiService;
 import com.zwt.shop.base.Result;
+import com.zwt.shop.dto.SpecParamDTO;
 import com.zwt.shop.dto.SpecificationDTO;
+import com.zwt.shop.entity.SpecParamEntity;
 import com.zwt.shop.entity.SpecificationEntity;
+import com.zwt.shop.mapper.SpecParamMapper;
 import com.zwt.shop.mapper.SpecificationMapper;
 import com.zwt.shop.service.SpecificationService;
 import com.zwt.shop.utils.zBeanUtils;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,9 +32,64 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
         @Resource
         private SpecificationMapper specificationMapper;
 
+        @Resource
+        private SpecParamMapper specParamMapper;
+
+    @Override
+    public Result<List<JsonObject>> specDelete(Integer id) {
+        if(id != null ){
+
+
+
+            specParamMapper.deleteByPrimaryKey(id);
+        }
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<List<JsonObject>> specEdit(SpecParamDTO specParamDTO) {
+        if(specParamDTO != null){
+            specParamMapper.updateByPrimaryKey(zBeanUtils.copyBean(specParamDTO, SpecParamEntity.class));
+        }
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<List<JsonObject>> specSave(SpecParamDTO specParamDTO) {
+        if(specParamDTO != null ){
+            specParamMapper.insertSelective(zBeanUtils.copyBean(specParamDTO,SpecParamEntity.class));
+        }
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<List<SpecParamEntity>> specList(SpecParamDTO specParamDTO) {
+        SpecParamEntity specParamEntity = zBeanUtils.copyBean(specParamDTO, SpecParamEntity.class);
+        Example example = new Example(SpecParamEntity.class);
+        example.createCriteria().andEqualTo("groupId",specParamEntity.getGroupId());
+        List<SpecParamEntity> specParamEntities = specParamMapper.selectByExample(example);
+        return this.setResultSuccess(specParamEntities);
+    }
+
     @Override
     public Result<List<JsonObject>> deleteById(Integer id) {
+
+        if(id != null){
+//            //通过id 查出数据     条件查询出的规格
+            Example example = new Example(SpecParamEntity.class);
+            //通过groupID 去tb_spec_param表里查询数据
+            example.createCriteria().andEqualTo("groupId",id);
+            List<SpecParamEntity> list = specParamMapper.selectByExample(example);
+            //如果有的话 那么无法删除
+            if (list.size()!=0){
+                return this.setResultError("被绑定 无法删除");
+            }
+
+
+        }
         specificationMapper.deleteByPrimaryKey(id);
+
         return this.setResultSuccess();
     }
 
