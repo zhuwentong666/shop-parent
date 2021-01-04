@@ -70,9 +70,9 @@ export default {
   },
   methods:{
       loadData(){
-          this.$http.get("/item/spec/groups/" + this.cid)
-          .then(({data}) => {
-              this.groups = data;
+          this.$http.get("/speci/list?cid=" + this.cid)
+          .then((resp) => {
+              this.groups = resp.data.data;
           })
           .catch(() => {
               this.groups = [];
@@ -91,7 +91,7 @@ export default {
       save(){
            this.$http({
             method: this.isEdit ? 'put' : 'post',
-            url: '/item/spec/group',
+            url: 'speci/save',
             data: this.group
           }).then(() => {
             // 关闭窗口
@@ -105,7 +105,7 @@ export default {
       deleteGroup(id){
           this.$message.confirm("确认要删除分组吗？")
           .then(() => {
-            this.$http.delete("/item/spec/group/" + id)
+            this.$http.delete("spec/group/" + id)
                 .then(() => {
                     this.$message.success("删除成功");
                     this.loadData();

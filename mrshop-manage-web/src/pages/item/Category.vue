@@ -25,11 +25,36 @@
     },
     methods: {
       handleAdd(node) {
+        node.isParent = node.isParent?1:0; 
+        delete node.id;
         console.log("add .... ");
-        console.log(node);
+        console.log(node.isparent);
+        this.$http.post('category/save',node).then(res=>{
+          console.log(res)
+          if(res.data.code==200){
+            this.key1 = new Date().getTime
+          this.$message.success("新增成功")
+          }else{
+            return this.$message.error("新增失败"+res.data.message);
+          }
+          
+          
+          
+        }).catch(error=>console.log(error))
       },
       handleEdit(id, name) {
         console.log("edit... id: " + id + ", name: " + name)
+        this.$http.put('/category/updateById',{
+          id:id,
+          name:name
+        }).then(res=>{
+          if(res.data.code==200){
+            this.key1 = new Date().getTime;
+            this.$message.success("修改成功")
+          }else{
+            this.$message.error("修改失败"+res.data.message);
+          }
+        }).catch(error=>console.log(error));
       },
       handleDelete(id) {
         console.log("删除....")

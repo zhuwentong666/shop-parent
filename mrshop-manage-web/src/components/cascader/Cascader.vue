@@ -110,7 +110,7 @@
             }
           }).then(resp => {
             const data = [];
-            for (let d of resp.data) {
+            for (let d of resp.data.data) {
               const node = {
                 value: d[this.itemValue],
                 label: d[this.itemText]
@@ -160,7 +160,7 @@
         handler(val) {
           if(val && this.showAllLevels && !this.multiple){
             this.selected = [val.map(o => o[this.itemText]).join("/")]
-          } else if (this.multiple && val) {
+          } else if (this.multiple && val && typeof val == 'object') {
             this.selected = val.map(o => {
               return {
                 label: o[this.itemText],

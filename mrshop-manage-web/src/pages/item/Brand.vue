@@ -34,7 +34,7 @@
           </v-btn>
         </td>
       </template>
-      <template slot="expand" slot-scope="props">
+      <template slot="expand" >
         <v-card flat>
           <v-card-text>Peek-a-boo!</v-card-text>
         </v-card>

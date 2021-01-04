@@ -6,6 +6,7 @@ spring:
     name: eureka-zuul
 
 zuul:
+
   # 声明路由
   routes:
     # 路由名称
@@ -13,10 +14,13 @@ zuul:
       # 声明将所有以/api-ribbon/的请求都转发到eureka-ribbon的服务中
       path: /api-xxx/**
       serviceId: xxx-server
-    # 启用重试
+  # 启用重试
   retryable: true
-
-#配置负载
+  # 包含此路径的不进行路由
+  ignored-patterns: /upload/**
+  # 忽略上传服务
+  ignored-services:
+    -upload-server
 ribbon:
   ConnectTimeout: 250 # 连接超时时间(ms)
   ReadTimeout: 2000 # 通信超时时间(ms)

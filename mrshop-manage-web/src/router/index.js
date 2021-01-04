@@ -24,9 +24,9 @@ export default new Router({
       children:[
         route("/index/dashboard","/Dashboard","Dashboard"),
         route("/item/category",'/item/Category',"Category"),
-        route("/item/brand",'/item/Brand',"Brand"),
+        route("/item/brand",'/item/NewBrand',"NewBrand"),
         route("/item/list",'/item/Goods',"Goods"),
-        route("/item/specification",'/item/Specification',"Specification"),
+        route("/item/specification",'/item/specification/Specification',"Specification"),
         route("/user/statistics",'/item/Statistics',"Statistics"),
         route("/trade/promotion",'/trade/Promotion',"Promotion")
       ]

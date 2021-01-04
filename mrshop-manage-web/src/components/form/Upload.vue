@@ -85,8 +85,8 @@
     methods: {
       handleSuccess(resp, file) {
         if (!this.multiple) {
-          this.dialogImageUrl = file.response;
-          this.$emit("input", file.response)
+          this.dialogImageUrl = file.response.data;
+          this.$emit("input", file.response.data)
         } else {
           this.fileList.push(file)
           this.$emit("input", this.fileList.map(f => f.response))

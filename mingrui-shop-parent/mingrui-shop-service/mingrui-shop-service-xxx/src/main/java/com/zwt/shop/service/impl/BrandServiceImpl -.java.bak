@@ -1,0 +1,127 @@
+package com.zwt.shop.service.impl;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.gson.JsonObject;
+import com.zwt.shop.base.BaseApiService;
+import com.zwt.shop.base.Result;
+import com.zwt.shop.dto.BrandDTO;
+import com.zwt.shop.entity.BrandEntity;
+import com.zwt.shop.entity.CategoryBrandEntity;
+import com.zwt.shop.mapper.BrandMapper;
+import com.zwt.shop.mapper.CategoryBrandMapper;
+import com.zwt.shop.service.BrandService;
+import com.zwt.shop.utils.ObjectUtils;
+import com.zwt.shop.utils.PinyinUtil;
+import com.zwt.shop.utils.zBeanUtils;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RestController;
+import tk.mybatis.mapper.entity.Example;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @ClassName BrandServiceImpl
+ * @Description: TODO
+ * @Author zhuwentong
+ * @Date 2020/12/25
+ * @Version V1.0
+ **/
+@RestController
+public class BrandServiceImpl extends BaseApiService implements BrandService {
+
+    @Resource
+    public BrandMapper brandMapper;
+
+    @Resource
+    public CategoryBrandMapper categoryBrandMapper;
+
+    @Override
+    public Result<BrandEntity> getBrandApi(BrandDTO brandDTO) {
+
+            //分页 page 1 rows 一页多少
+        PageHelper.startPage(brandDTO.getPage(),brandDTO.getRows());
+        if(!StringUtils.isEmpty(brandDTO.getSort())){
+            PageHelper.orderBy(brandDTO.getOrderBy());
+        }
+
+//        BrandEntity brandEntity = new BrandEntity();
+//        //copy bean 把数据 copy给 brandEntity
+//        BeanUtils.copyProperties(brandDTO,brandEntity);
+        //这里是把 传过来的 DTO copy到 brandEntity里面
+        BrandEntity brandEntity = zBeanUtils.copyBean(brandDTO, BrandEntity.class);
+        Example example = new Example(BrandEntity.class);
+        //进行模糊查询
+        example.createCriteria().andLike("name","%"+ brandEntity.getName()  +"%");
+        List<BrandEntity> brandEntityList = brandMapper.selectByExample(example);
+        //这里面放的就是我们要传的值
+        PageInfo<BrandEntity> pageInfo = new PageInfo<>(brandEntityList);
+
+
+        return this.setResultSuccess(pageInfo);
+    }
+
+    @Override
+    @Transactional
+    public Result<JsonObject> brandSave(BrandDTO brandDTO) {
+        if(new ObjectUtils().isNull(brandDTO)){
+            return this.setResultError("cuocuocuo");
+        }
+
+        //先把值copy一下
+     BrandEntity brandEntity = zBeanUtils.copyBean(brandDTO, BrandEntity.class);
+        //处理品牌首字母
+        brandEntity
+                .setLetter(PinyinUtil
+                        .getUpperCase(String
+                                .valueOf(brandEntity
+                                        .getName()
+                                        .toCharArray()[0]),false)
+                        .toCharArray()[0]);
+
+        //先把模态框里的数据新增进数据库,然后要把主键返回回来
+        brandMapper.insert(brandEntity);
+
+        //中间表
+        // 这是商品分类的id
+        String categories = brandDTO.getCategories();
+        if(StringUtils.isEmpty(categories)){return this.setResultError("nullnull");};
+
+        //判断传来的id 是否为多个
+        if(categories.contains(",")){
+            String[] split = categories.split(",");
+
+            List<CategoryBrandEntity> brandEntityArrayList = new ArrayList<>();
+
+            //遍历一下id
+            for (String s : split) {
+            //把前台传过来的id们 进行赋值进 中间表的实例
+                CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
+                //把brandId 放到中间表里面
+                categoryBrandEntity.setBrandId(brandEntity.getId());
+                //把遍历的 多个 id 进行一个存值
+                categoryBrandEntity.setCategoryId(Integer.valueOf(s));
+                //放到list集合中
+                brandEntityArrayList.add(categoryBrandEntity);
+            }
+            //进行批量新增
+            categoryBrandMapper.insertList(brandEntityArrayList);
+        }else{
+            //如果是单个的话 单新增
+            CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
+            //把brandId 放到中间表里面
+            categoryBrandEntity.setBrandId(brandEntity.getId());
+            //把遍历的 多个 id 进行一个存值
+            categoryBrandEntity.setCategoryId(Integer.valueOf(categories));
+            categoryBrandMapper.insert(categoryBrandEntity);
+
+        }
+
+        return this.setResultSuccess();
+    }
+
+
+}
