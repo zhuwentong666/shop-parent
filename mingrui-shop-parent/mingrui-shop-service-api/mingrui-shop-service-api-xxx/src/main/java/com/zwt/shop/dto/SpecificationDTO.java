@@ -30,4 +30,5 @@ public class SpecificationDTO extends BaseDTO {
     @NotEmpty(message = "规格组名称不能为空", groups = {QuanJuErrorOperation.Add.class})
     private String name;
 
+
 }

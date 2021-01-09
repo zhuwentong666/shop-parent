@@ -11,4 +11,5 @@ public interface CategoryBrandMapper extends Mapper<CategoryBrandEntity>, Insert
 
     @Select(value="select * from tb_category_brand where category_id =#{id}")
     List<CategoryBrandEntity> selectByCategoryId(Integer id);
+
 }

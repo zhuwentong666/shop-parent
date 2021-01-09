@@ -6,13 +6,13 @@
       <v-flex xs3>
         状态：
         <v-btn-toggle mandatory v-model="search.saleable">
-          <v-btn flat>
+          <v-btn flat :value="2">
             全部
           </v-btn>
-          <v-btn flat :value="true">
+          <v-btn flat :value="1">
             上架
           </v-btn>
-          <v-btn flat :value="false">
+          <v-btn flat :value="0">
             下架
           </v-btn>
         </v-btn-toggle>
@@ -48,8 +48,8 @@
           <v-btn icon small @click="deleteItem(props.item.id)">
             <i class="el-icon-delete"/>
           </v-btn>
-          <v-btn icon small v-if="props.item.saleable">下架</v-btn>
-          <v-btn icon v-else>上架</v-btn>
+          <v-btn icon small v-if="props.item.saleable" @click="editSaleable(props.item)">下架</v-btn>
+          <v-btn icon v-else @click="editSaleable(props.item)">上架</v-btn>
         </td>
       </template>
       <template slot="no-data">
@@ -92,7 +92,7 @@
 
 <script>
   import GoodsForm from './GoodsForm'
-  import {goodsData} from "../../mockDB";
+  // import {goodsData} from "../../mockDB";
 
   export default {
     name: "item",
@@ -140,6 +140,20 @@
       this.getDataFromApi();
     },
     methods: {
+      editSaleable(item){
+        let tishi = item.saleable==1?"下架":"上架"
+
+        this.$message.confirm("是否"+tishi+ "?").then(()=>{
+        this.$http.put("goods/xiajia",{
+            id:item.id,
+            saleable:item.saleable
+        }).then(resp=>{
+          this.closeForm();
+          console.log(resp)
+        })
+        })
+        
+      },
       closeForm() {
         this.isEdit = false;
         this.show = false;
@@ -167,28 +181,51 @@
         this.show = true;
       },
       editItem(item) {
-        this.selectedGoods = item;
-        const names = item.categoryName.split("/");
-        this.selectedGoods.categories = [
-          {id: item.cid1, name: names[0]},
-          {id: item.cid2, name: names[1]},
-          {id: item.cid3, name: names[2]}
-        ];
-        // 查询商品详情
-        this.$http.get("/item/goods/spu/detail/" + item.id)
-          .then(resp => {
-            this.selectedGoods.spuDetail = resp.data;
-            this.selectedGoods.spuDetail.specTemplate = JSON.parse(resp.data.specTemplate);
-            this.selectedGoods.spuDetail.specifications = JSON.parse(resp.data.specifications);
-          })
         this.isEdit = true;
         this.show = true;
+        // this.selectedGoods = item;
+        // const names = item.categoryName.split("/");
+        // this.selectedGoods.categories = [
+        //   {id: item.cid1, name: names[0]},
+        //   {id: item.cid2, name: names[1]},
+        //   {id: item.cid3, name: names[2]}
+        // ];
+        // 查询商品详情
+        let obj = item;
+        this.$http.get("/goods/spuByIdGetDetail/",{
+          params:{
+            spuId:item.id
+          }
+        }).then(resp => {
+            obj.categories = []; //监控到的值为undefined
+            // this.selectedGoods.spuDetail = resp.data.data;
+            // this.selectedGoods.spuDetail.specTemplate = JSON.parse(resp.data.data.specialSpec);
+            // this.selectedGoods.spuDetail.specifications = JSON.parse(resp.data.data.genericSpec);
+              obj.spuDetail = resp.data.data;
+              obj.spuDetail.specTemplate = JSON.parse(resp.data.data.specialSpec);//特有的规格参数
+              obj.spuDetail.specifications = JSON.parse(resp.data.data.genericSpec); //通用规格参数
+            //查询sku
+           
+          this.$http.get("goods/skuBySpuIdStock",{
+              params:{
+                 spuId:item.id
+              }
+            }).then(resp=>{
+        
+         
+            obj.skus = resp.data.data;
+            this.selectedGoods = obj;
+          })
+           
+          })
+           
+        
       },
       deleteItem(id) {
         this.$message.confirm('此操作将永久删除该商品, 是否继续?')
           .then(() => {
             // 发起删除请求
-            this.$http.delete("/item/goods?id=" + id)
+            this.$http.delete("/goods/delete?spuId=" + id)
               .then(() => {
                 // 删除成功，重新加载数据
                 this.getDataFromApi();
@@ -202,12 +239,22 @@
       },
       getDataFromApi() {
         this.loading = true;
-        setTimeout(() => {
-          // 返回假数据
-          this.items = goodsData.slice(0, 4);
-          this.totalItems = 25;
+        this.$http.get('spu/spuList',{
+          params:{
+                    page:this.pagination.page,
+                    rows:this.pagination.rowsPerPage,
+                    sort: this.pagination.sortBy,
+                    order: this.pagination.descending,
+                    title: this.search.key,
+                    saleable:this.search.saleable
+                }
+        }).then(resp=>{
+          // console.log(resp)
+           this.items = resp.data.data
+           this.totalItems=resp.data.message - 0;
           this.loading = false;
-        }, 300)
+         
+        }).catch(error=>console.log(error))
       }
     }
   }

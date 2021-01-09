@@ -50,7 +50,7 @@
     methods: {
       getData() {
         this.$http.get(this.url, {params: {pid: 0}}).then(resp => {
-          console.log(resp)
+          // console.log(resp)
           this.db = resp.data.data;
           this.db.forEach(n => n['path'] = [n.name])
         })

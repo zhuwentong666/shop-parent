@@ -4,8 +4,10 @@ import com.google.gson.JsonObject;
 import com.zwt.shop.base.Result;
 import com.zwt.shop.dto.BrandDTO;
 import com.zwt.shop.entity.BrandEntity;
+import com.zwt.shop.validate.group.QuanJuErrorOperation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +24,17 @@ public interface BrandService {
     @ApiOperation("获取品牌信息")
     @GetMapping(value="brand/getbrandList")
     public Result<List<BrandEntity>> getBrandApi(BrandDTO brandDTO);
+    @ApiOperation("通过categoryid获取品牌信息")
+    @GetMapping(value="/brand/getBrandIdByCategoryId")
+    public Result<List<BrandEntity>> getBrandIdByCategoryId(Integer cid);
+
     @ApiOperation("删除品牌")
     @DeleteMapping(value="/brand/DeleteId")
     public Result<JsonObject> deleteById(Integer id);
     @ApiOperation("新增")
     @PostMapping(value="brand/save")
-    public Result<JsonObject> brandSave(@RequestBody BrandDTO brandDTO);
+    public Result<JsonObject> brandSave(@Validated(QuanJuErrorOperation.Add.class)@RequestBody BrandDTO brandDTO);
     @ApiOperation("修改")
     @PutMapping(value="brand/save")
-    public Result<JsonObject> brandPut(@RequestBody BrandDTO brandDTO);
+    public Result<JsonObject> brandPut(@Validated(QuanJuErrorOperation.Update.class)@RequestBody BrandDTO brandDTO);
 }

@@ -41,6 +41,15 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
 
 
     @Override
+    public Result<List<BrandEntity>> getBrandIdByCategoryId(Integer cid) {
+
+        //通过cid查询brandName数据
+       List<BrandEntity> CbList = brandMapper.getBrandIdByCategoryId(cid);
+
+        return this.setResultSuccess(CbList);
+    }
+
+    @Override
     public Result<JsonObject> deleteById(Integer id) {
 
         brandMapper.deleteByPrimaryKey(id);
@@ -60,9 +69,10 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         Example example = new Example(CategoryBrandEntity.class);
         example.createCriteria().andEqualTo("brandId",brandEntity.getId());
         categoryBrandMapper.deleteByExample(example);
+
+
         //这是categories id
         String categories = brandDTO.getCategories();
-
         List<CategoryBrandEntity> categoryBrandEntities = new ArrayList<>();
         if(categories.contains(",")){
             String[] split = categories.split(",");
@@ -120,9 +130,9 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         brandEntity.setLetter(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().toCharArray()[0]), false).toCharArray()[0]);
         //新增 获取到新增id
         brandMapper.insert(brandEntity);
+
         //这是categories id
         String categories = brandDTO.getCategories();
-
         List<CategoryBrandEntity> categoryBrandEntities = new ArrayList<>();
         if(categories.contains(",")){
             String[] split = categories.split(",");

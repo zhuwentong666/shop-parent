@@ -10,6 +10,7 @@ import com.zwt.shop.entity.SpecificationEntity;
 import com.zwt.shop.mapper.SpecParamMapper;
 import com.zwt.shop.mapper.SpecificationMapper;
 import com.zwt.shop.service.SpecificationService;
+import com.zwt.shop.utils.ObjectUtils;
 import com.zwt.shop.utils.zBeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,12 +38,8 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
 
     @Override
     public Result<List<JsonObject>> specDelete(Integer id) {
-        if(id != null ){
+        if(id != null )specParamMapper.deleteByPrimaryKey(id);
 
-
-
-            specParamMapper.deleteByPrimaryKey(id);
-        }
 
         return this.setResultSuccess();
     }
@@ -67,7 +64,14 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     public Result<List<SpecParamEntity>> specList(SpecParamDTO specParamDTO) {
         SpecParamEntity specParamEntity = zBeanUtils.copyBean(specParamDTO, SpecParamEntity.class);
         Example example = new Example(SpecParamEntity.class);
-        example.createCriteria().andEqualTo("groupId",specParamEntity.getGroupId());
+        Example.Criteria criteria = example.createCriteria();
+        if(ObjectUtils.isNotNull(specParamEntity.getGroupId())){
+        criteria.andEqualTo("groupId",specParamEntity.getGroupId());
+        }
+        if (ObjectUtils.isNotNull(specParamEntity.getCid())){
+            criteria.andEqualTo("cid",specParamEntity.getCid());
+        }
+
         List<SpecParamEntity> specParamEntities = specParamMapper.selectByExample(example);
         return this.setResultSuccess(specParamEntities);
     }
@@ -76,7 +80,7 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     public Result<List<JsonObject>> deleteById(Integer id) {
 
         if(id != null){
-//            //通过id 查出数据     条件查询出的规格
+           //通过id 查出数据     条件查询出的规格
             Example example = new Example(SpecParamEntity.class);
             //通过groupID 去tb_spec_param表里查询数据
             example.createCriteria().andEqualTo("groupId",id);

@@ -9,10 +9,10 @@ package com.zwt.shop.utils;
  **/
 public class ObjectUtils {
 
-    public boolean isNull(Object obj){
+    public static boolean isNull(Object obj){
         return obj == null;
     }
-    public boolean isNotNull(Object obj){
+    public static boolean isNotNull(Object obj){
         return obj != null;
     }
 

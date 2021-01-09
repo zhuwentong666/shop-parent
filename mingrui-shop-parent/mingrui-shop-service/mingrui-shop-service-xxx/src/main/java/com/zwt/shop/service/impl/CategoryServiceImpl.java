@@ -86,32 +86,23 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
             //判断传来的id是否有异常
             if(id != null && id < 0){ return this.setResultError("当前数据不正确"); }
-
             //通过id查询出子节点的数据
             CategoryEntity categoryEntity = categoryMapper.selectByPrimaryKey(id);
-
             //判断当前节点是否是父级节点(安全)
             if (categoryEntity.getIsParent()==1) {return this.setResultError("父类节点不可删除");}
-
             //如果当前分类被品牌绑定的话不能被删除 --> 通过分类id查询中间表是否有数据 true : 当前分类不能被删除 false:继续执行
-
 //        Example example1 = new Example(CategoryBrandEntity.class);
 //            example1.createCriteria().andEqualTo("categoryId",id);
 //        List<CategoryBrandEntity> categoryBrandEntityList = categoryBrandMapper.selectByExample(example1);
 //        if (categoryBrandEntityList.size()!=0){return this.setResultError("已绑定品牌 删除失败");};
-
-
-
+        //如果当前分类被品牌绑定的话不能被删除 --> 通过分类id查询中间表是否有数据 true : 当前分类不能被删除 false:继续执行
         List<CategoryBrandEntity> categoryBrandList = categoryBrandMapper.selectByCategoryId(id);
             if(categoryBrandList.size()>0)return this.setResultError("被绑定 无法删除");
-
-
 
         //判断当前父类节点除了当前子节点是否还有其他子节点
             Example example = new Example(CategoryEntity.class);
             example.createCriteria().andEqualTo("parentId",categoryEntity.getParentId());
             List<CategoryEntity> list = categoryMapper.selectByExample(example);
-
 
             if (list.size()==1){
                 //判断通过父类id查询出的子类是否有其他子类 如果 只有一条 那么改掉父类节点的isprent = 0

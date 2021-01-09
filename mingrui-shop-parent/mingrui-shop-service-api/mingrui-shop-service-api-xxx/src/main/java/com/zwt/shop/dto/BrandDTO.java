@@ -33,5 +33,6 @@ public class BrandDTO extends BaseDTO {
     private Character letter;
 
     @ApiModelProperty(value = "品牌分类信息")
+    @NotEmpty(message = "品牌分类信息不得为空",groups = {QuanJuErrorOperation.Add.class,QuanJuErrorOperation.Update.class})
     private String categories;
 }

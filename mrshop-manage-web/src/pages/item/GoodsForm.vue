@@ -18,7 +18,7 @@
               <v-flex xs5>
                 <!--商品分类-->
                 <v-cascader
-                  url="/item/category/list"
+                  url="/category/list"
                   required
                   showAllLevels
                   v-model="goods.categories"
@@ -32,7 +32,7 @@
                   item-text="name"
                   item-value="id"
                   label="所属品牌"
-                  v-model="goods.brandId"
+                  v-model="goods.brand_id"
                   required
                   autocomplete
                   clearable
@@ -46,7 +46,7 @@
               </v-flex>
             </v-layout>
             <v-text-field label="商品标题" v-model="goods.title" :counter="200" required :rules="[v => !!v || '商品标题不能为空']" hide-details/>
-            <v-text-field label="商品卖点" v-model="goods.subTitle" :counter="200" hide-details/>
+            <v-text-field label="商品卖点" v-model="goods.sub_title" :counter="200" hide-details/>
             <v-text-field label="包装清单" v-model="goods.spuDetail.packingList" :counter="1000" multi-line :rows="3" hide-details/>
             <v-text-field label="售后服务" v-model="goods.spuDetail.afterService" :counter="1000" multi-line :rows="3" hide-details/>
           </v-form>
@@ -54,7 +54,7 @@
       </v-stepper-content>
       <!--2、商品描述-->
       <v-stepper-content step="2">
-        <v-editor v-model="goods.spuDetail.description" upload-url="/upload/image"/>
+        <v-editor v-model="goods.spuDetail.description" upload-url="/upload"/>
       </v-stepper-content>
       <!--3、规格参数-->
       <v-stepper-content step="3">
@@ -116,7 +116,7 @@
               <template slot="expand" slot-scope="props">
                 <v-card class="elevation-2 flex xs11 mx-auto my-2">
                   <!--图片上传组件-->
-                  <v-upload v-model="props.item.images" url="/upload/image"/>
+                  <v-upload v-model="props.item.images" url="/upload/"/>
                 </v-card>
               </template>
             </v-data-table>
@@ -152,9 +152,9 @@ export default {
       valid:false,
       goods: {
         categories: [], // 商品分类信息
-        brandId: 0, // 品牌id信息
+        brand_id: 0, // 品牌id信息
         title: "", // 标题
-        subTitle: "", // 子标题
+        sub_title: "", // 子标题
         spuDetail: {
           packingList: "", // 包装列表
           afterService: "", // 售后服务
@@ -188,6 +188,7 @@ export default {
         specTemplate[id] = options;
       });
       // 处理sku
+      console.log(this.skus)
       const skus = this.skus
         .filter(s => s.enable)
         .map(({ price, stock, enable, images, indexes, ...rest }) => {
@@ -203,7 +204,7 @@ export default {
             indexes,
             enable,
             title, // 基本属性
-            images: images ? images.join(",") : '', // 图片
+            images: images ? images.map(i=>i.data).join(",") : '', // 图片
             ownSpec: JSON.stringify(obj) // 特有规格参数
           };
         });
@@ -215,15 +216,15 @@ export default {
       });
       goodsParams.spuDetail.genericSpec = JSON.stringify(specs);
       goodsParams.spuDetail.specialSpec = JSON.stringify(specTemplate);
-
+      console.log(JSON.stringify(goodsParams))
       this.$http({
         method: this.isEdit ? "put" : "post",
-        url: "/item/goods",
+        url: "goods/save",
         data: goodsParams
       })
         .then(() => {
           // 成功，关闭窗口
-          this.$emit("close");
+          this.$emit("closeForm");
           // 提示成功
           this.$message.success("保存成功了");
         })
@@ -236,12 +237,13 @@ export default {
     oldGoods: {
       deep: true,
       handler(val) {
+        console.log(val)
         if (!this.isEdit) {
           Object.assign(this.goods, {
             categories: null, // 商品分类信息
-            brandId: 0, // 品牌id信息
+            brand_Id: 0, // 品牌id信息
             title: "", // 标题
-            subTitle: "", // 子标题
+            sub_title: "", // 子标题
             spuDetail: {
               packingList: "", // 包装列表
               afterService: "", // 售后服务
@@ -254,14 +256,14 @@ export default {
           this.goods = Object.deepCopy(val);
 
           // 先得到分类名称
-          const names = val.cname.split("/");
+          const names = val.categoryName.split("/");
           // 组织商品分类数据
           this.goods.categories = [
             { id: val.cid1, name: names[0] },
             { id: val.cid2, name: names[1] },
             { id: val.cid3, name: names[2] }
           ];
-
+        
           // 将skus处理成map
           const skuMap = new Map();
           this.goods.skus.forEach(s => {
@@ -278,14 +280,22 @@ export default {
         if (val && val.length > 0) {
           // 根据分类查询品牌
           this.$http
-            .get("/item/brand/cid/" + this.goods.categories[2].id)
-            .then(({ data }) => {
-              this.brandOptions = data;
+            .get("/brand/getBrandIdByCategoryId" ,{
+              params:{
+                cid:this.goods.categories[2].id
+              }
+            }).then((resp) => {
+              // console.log(resp)
+              this.brandOptions = resp.data.data;
             });
           // 根据分类查询规格参数
           this.$http
-            .get("/item/spec/params?cid=" + this.goods.categories[2].id)
-            .then(({ data }) => {
+            .get("/spec/list",{
+              params:{
+                cid:this.goods.categories[2].id
+              }
+            }) 
+            .then((resp) => {
               let specs = [];
               let template = [];
               if (this.isEdit){
@@ -295,7 +305,7 @@ export default {
               // 对特有规格进行筛选
               const arr1 = [];
               const arr2 = [];
-              data.forEach(({id, name,generic, numeric, unit }) => {
+             resp.data.data.forEach(({id, name,generic, numeric, unit }) => {
                 if(generic){
                   const o = { id, name, numeric, unit};
                   if(this.isEdit){

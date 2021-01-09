@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalException {
 
-    @ExceptionHandler(value = RuntimeException.class)
-    public Result<JsonObject> testExcepiton(RuntimeException runtimeException){
-
-        log.error("code : {} , message : {}", HTTPStatus.ERROR,runtimeException.getMessage());
-
-        return new Result<JsonObject>(HTTPStatus.ERROR,runtimeException.getMessage(),null);
-    }
+//    @ExceptionHandler(value = RuntimeException.class)
+//    public Result<JsonObject> testExcepiton(RuntimeException runtimeException){
+//
+//        log.error("code : {} , message : {}", HTTPStatus.ERROR,runtimeException.getMessage());
+//
+//        return new Result<JsonObject>(HTTPStatus.ERROR,runtimeException.getMessage(),null);
+//    }
 
 }
