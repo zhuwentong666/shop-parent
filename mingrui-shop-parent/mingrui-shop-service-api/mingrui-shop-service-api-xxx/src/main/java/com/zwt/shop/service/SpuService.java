@@ -4,10 +4,12 @@ import com.google.gson.JsonObject;
 import com.zwt.shop.base.Result;
 import com.zwt.shop.dto.SkuDTO;
 import com.zwt.shop.dto.SpuDTO;
+import com.zwt.shop.dto.SpuDetailDTO;
 import com.zwt.shop.entity.SpuEntity;
 import com.zwt.shop.validate.group.QuanJuErrorOperation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,16 +20,19 @@ public interface SpuService {
 
     @ApiOperation(value = "通过spuId查询sku和库存")
     @GetMapping(value = "goods/skuBySpuIdStock")
-    Result<List<SkuDTO>> skuBySpuIdStock(Integer spuId);
+    Result<List<SkuDTO>> skuBySpuIdStock(@RequestParam Integer spuId);
 
     @ApiOperation(value = "通过spuId回显商品详情detail")
     @GetMapping(value = "goods/spuByIdGetDetail")
-    Result<JsonObject> spuByIdGetDetail(Integer spuId);
+    Result<JsonObject> spuByIdGetDetail(@RequestParam Integer spuId);
 
+    @ApiOperation(value = "通过spuId回显商品详情detail")
+    @GetMapping(value = "goods/spuGetDetail")
+    Result<SpuDetailDTO> spuGetDetail(@RequestParam Integer spuId);
 
     @ApiOperation(value = "商品列表查询")
     @GetMapping(value = "spu/spuList")
-    Result<List<SpuDTO>> SpuList(SpuDTO spuDTO);
+    Result<List<SpuDTO>> SpuList(@SpringQueryMap SpuDTO spuDTO);
 
     @PostMapping(value="goods/save")
     @ApiOperation(value="商品列表新增")

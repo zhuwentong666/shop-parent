@@ -7,6 +7,7 @@ import com.zwt.shop.base.BaseApiService;
 import com.zwt.shop.base.Result;
 import com.zwt.shop.dto.SkuDTO;
 import com.zwt.shop.dto.SpuDTO;
+import com.zwt.shop.dto.SpuDetailDTO;
 import com.zwt.shop.entity.*;
 import com.zwt.shop.mapper.*;
 import com.zwt.shop.service.SpuService;
@@ -132,6 +133,12 @@ public class SpuServiceImpl extends BaseApiService implements SpuService {
 
         SpuDetailEntity spuDetailEntity = spuDetailMapper.selectByPrimaryKey(spuId);
 
+        return this.setResultSuccess(spuDetailEntity);
+    }
+
+    @Override
+    public Result<SpuDetailDTO> spuGetDetail(Integer spuId) {
+        SpuDetailEntity spuDetailEntity = spuDetailMapper.selectByPrimaryKey(spuId);
         return this.setResultSuccess(spuDetailEntity);
     }
 

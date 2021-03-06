@@ -9,6 +9,7 @@ import com.zwt.shop.entity.SpecificationEntity;
 import com.zwt.shop.validate.group.QuanJuErrorOperation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ public interface SpecificationService {
 
     @ApiOperation(value = "查询规格参数")
     @GetMapping(value = "spec/list")
-    Result<List<SpecParamEntity>> specList(SpecParamDTO specParamDTO);
+    Result<List<SpecParamEntity>> specList(@SpringQueryMap SpecParamDTO specParamDTO);
     @ApiOperation(value="新增规格参数")
     @PostMapping(value="spec/param")
     Result<List<JsonObject>> specSave(@Validated(QuanJuErrorOperation.Add.class)@RequestBody SpecParamDTO specParamDTO);

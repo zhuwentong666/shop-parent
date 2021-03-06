@@ -11,7 +11,6 @@ import com.zwt.shop.entity.CategoryBrandEntity;
 import com.zwt.shop.mapper.BrandMapper;
 import com.zwt.shop.mapper.CategoryBrandMapper;
 import com.zwt.shop.service.BrandService;
-import com.zwt.shop.utils.ObjectUtils;
 import com.zwt.shop.utils.PinyinUtil;
 import com.zwt.shop.utils.zBeanUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,9 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName BrandServiceImpl
@@ -39,6 +40,18 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     @Resource
     public CategoryBrandMapper categoryBrandMapper;
 
+
+    @Override
+    public Result<List<BrandEntity>> getBrandByIds(String brandIds) {
+
+        List<Integer> ids = Arrays.asList(brandIds.split(",")).stream().map(id -> {
+            return Integer.parseInt(id);
+        }).collect(Collectors.toList());
+        List<BrandEntity> brandEntities = brandMapper.selectByIdList(ids);
+
+
+        return this.setResultSuccess(brandEntities);
+    }
 
     @Override
     public Result<List<BrandEntity>> getBrandIdByCategoryId(Integer cid) {
