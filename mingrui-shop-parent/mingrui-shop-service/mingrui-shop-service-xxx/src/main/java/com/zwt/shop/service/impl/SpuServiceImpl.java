@@ -186,6 +186,7 @@ public class SpuServiceImpl extends BaseApiService implements SpuService {
         if(!StringUtils.isEmpty(spuDTO.getTitle())){
             criteria.andLike("title","%"+ spuDTO.getTitle()  +"%");
         }
+        criteria.andEqualTo(spuDTO.getId());
 
 
 

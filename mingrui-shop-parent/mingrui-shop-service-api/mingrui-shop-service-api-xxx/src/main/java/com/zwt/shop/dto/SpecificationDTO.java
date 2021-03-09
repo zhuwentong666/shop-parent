@@ -1,6 +1,7 @@
 package com.zwt.shop.dto;
 
 import com.zwt.shop.base.BaseDTO;
+import com.zwt.shop.entity.SpecParamEntity;
 import com.zwt.shop.validate.group.QuanJuErrorOperation;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,6 +10,7 @@ import lombok.Data;
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @ClassName SpecificationDTO
@@ -29,6 +31,8 @@ public class SpecificationDTO extends BaseDTO {
     @ApiModelProperty(name = "规格组的名称")
     @NotEmpty(message = "规格组名称不能为空", groups = {QuanJuErrorOperation.Add.class})
     private String name;
+
+    private List<SpecParamEntity> specList;
 
 
 }

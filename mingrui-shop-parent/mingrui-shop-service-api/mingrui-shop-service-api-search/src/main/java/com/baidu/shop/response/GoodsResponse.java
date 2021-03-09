@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName GoodsResponse
@@ -21,16 +22,26 @@ import java.util.List;
 @NoArgsConstructor
 public class GoodsResponse extends Result<List<GoodsDoc>> {
     private Long total;
+
     private Long totalPage;
-    private List<BrandEntity> brandList;
+
     private List<CategoryEntity> categoryList;
-    public GoodsResponse(Long total, Long totalPage, List<BrandEntity>
-            brandList, List<CategoryEntity> categoryList, List<GoodsDoc> goodsDocs){
-        super(HTTPStatus.OK,HTTPStatus.OK + "",goodsDocs);
+
+    private List<BrandEntity> brandList;
+
+    private Map<String, List<String>> specMap;
+
+    public GoodsResponse(Long total, Long totalPage, List<CategoryEntity> categoryList
+            , List<BrandEntity> brandList,List<GoodsDoc> goodsDocList
+            ,Map<String, List<String>> specMap){
+        //父类的构造函数
+        super(HTTPStatus.OK,"",goodsDocList);
+
         this.total = total;
         this.totalPage = totalPage;
-        this.brandList = brandList;
         this.categoryList = categoryList;
+        this.brandList = brandList;
+        this.specMap = specMap;
     }
 
 }

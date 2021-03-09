@@ -35,5 +35,5 @@ public interface ShopElasticsearchService {
     Result<JSONObject> clearGoodsEsData();
     @ApiOperation(value = "搜索")
     @GetMapping(value = "es/search")
-    Result<List<GoodsDoc>> search(@RequestParam String search,Integer page);
+    Result<List<GoodsDoc>> search(@RequestParam String search,Integer page,@RequestParam String filter);
 }

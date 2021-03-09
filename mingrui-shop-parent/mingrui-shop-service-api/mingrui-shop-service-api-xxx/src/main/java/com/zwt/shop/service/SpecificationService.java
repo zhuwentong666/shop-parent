@@ -20,7 +20,7 @@ public interface SpecificationService {
 
     @ApiOperation(value="通过条件查询查出数据")
     @GetMapping("speci/list")
-    Result<List<SpecificationEntity>> specificationList(SpecificationDTO specificationDTO);
+    Result<List<SpecificationEntity>> specificationList(@SpringQueryMap SpecificationDTO specificationDTO);
 
     @ApiOperation(value="新增数据")
     @PostMapping("speci/save")

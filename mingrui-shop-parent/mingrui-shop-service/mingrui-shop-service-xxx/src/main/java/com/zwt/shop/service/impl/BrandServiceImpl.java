@@ -11,8 +11,10 @@ import com.zwt.shop.entity.CategoryBrandEntity;
 import com.zwt.shop.mapper.BrandMapper;
 import com.zwt.shop.mapper.CategoryBrandMapper;
 import com.zwt.shop.service.BrandService;
+import com.zwt.shop.utils.ObjectUtils;
 import com.zwt.shop.utils.PinyinUtil;
 import com.zwt.shop.utils.zBeanUtils;
+import io.netty.util.internal.ObjectUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +41,30 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
 
     @Resource
     public CategoryBrandMapper categoryBrandMapper;
+
+
+    @Override
+    public Result<PageInfo<BrandEntity>> getBrandInfo(BrandDTO brandDTO) {
+
+        if(ObjectUtils.isNotNull(brandDTO.getPage()) && ObjectUtils.isNotNull(brandDTO.getRows()))
+            PageHelper.startPage(brandDTO.getPage(),brandDTO.getRows());
+
+        if(!StringUtils.isEmpty(brandDTO.getSort())) PageHelper.orderBy(brandDTO.getOrderBy());
+
+        BrandEntity brandEntity = zBeanUtils.copyBean(brandDTO,BrandEntity.class);
+
+        Example example = new Example(BrandEntity.class);
+        Example.Criteria criteria = example.createCriteria();
+        if(!StringUtils.isEmpty(brandEntity.getName()))
+            criteria.andLike("name","%" + brandEntity.getName() + "%");
+        if(ObjectUtils.isNotNull(brandDTO.getId()))
+            criteria.andEqualTo("id",brandDTO.getId());
+
+        List<BrandEntity> brandEntities = brandMapper.selectByExample(example);
+        PageInfo<BrandEntity> pageInfo = new PageInfo<>(brandEntities);
+
+        return this.setResultSuccess(pageInfo);
+    }
 
 
     @Override
@@ -109,7 +135,9 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     public Result<List<BrandEntity>> getBrandApi(BrandDTO brandDTO) {
 
             //分页 page 1 rows 一页多少
-        PageHelper.startPage(brandDTO.getPage(),brandDTO.getRows());
+        if (ObjectUtils.isNotNull(brandDTO.getPage())&&ObjectUtils.isNotNull(brandDTO.getRows())){
+            PageHelper.startPage(brandDTO.getPage(),brandDTO.getRows());
+        }
 
         if(!StringUtils.isEmpty(brandDTO.getSort())){
             PageHelper.orderBy(brandDTO.getOrderBy());
@@ -122,8 +150,11 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         BrandEntity brandEntity = zBeanUtils.copyBean(brandDTO, BrandEntity.class);
        // brandEntity.setLetter(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().toCharArray()[0]), false).toCharArray()[0]);
         Example example = new Example(BrandEntity.class);
+        Example.Criteria criteria = example.createCriteria();
         //进行模糊查询
-        example.createCriteria().andLike("name","%"+ brandEntity.getName()  +"%");
+        criteria.andLike("name","%"+ brandEntity.getName()  +"%");
+        criteria.andEqualTo("id",brandDTO.getId());
+
         List<BrandEntity> brandEntityList = brandMapper.selectByExample(example);
         //这里面放的就是我们要传的值
         PageInfo<BrandEntity> pageInfo = new PageInfo<>(brandEntityList);

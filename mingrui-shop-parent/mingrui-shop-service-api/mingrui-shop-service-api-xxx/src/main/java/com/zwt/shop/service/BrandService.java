@@ -1,5 +1,6 @@
 package com.zwt.shop.service;
 
+import com.github.pagehelper.PageInfo;
 import com.google.gson.JsonObject;
 import com.zwt.shop.base.Result;
 import com.zwt.shop.dto.BrandDTO;
@@ -7,6 +8,7 @@ import com.zwt.shop.entity.BrandEntity;
 import com.zwt.shop.validate.group.QuanJuErrorOperation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,12 +23,16 @@ import java.util.List;
  **/
 @Api(tags = "品牌接口")
 public interface BrandService {
+    @GetMapping(value = "brand/list")
+    @ApiOperation(value = "查询品牌列表")
+    Result<PageInfo<BrandEntity>> getBrandInfo(@SpringQueryMap BrandDTO brandDTO);
+
     @ApiOperation("获取品牌信息")
     @GetMapping(value="brand/getbrandList")
-    public Result<List<BrandEntity>> getBrandApi(BrandDTO brandDTO);
+    public Result<List<BrandEntity>> getBrandApi(@SpringQueryMap BrandDTO brandDTO);
     @ApiOperation("通过categoryid获取品牌信息")
     @GetMapping(value="/brand/getBrandIdByCategoryId")
-    public Result<List<BrandEntity>> getBrandIdByCategoryId(Integer cid);
+    public Result<List<BrandEntity>> getBrandIdByCategoryId(@RequestParam Integer cid);
 
     @ApiOperation("删除品牌")
     @DeleteMapping(value="/brand/DeleteId")
